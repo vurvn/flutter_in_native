@@ -1,7 +1,7 @@
 # flutter_in_native
 simple flutter in native android & iOS app
 
-<img src="https://miro.medium.com/max/2202/1*qPMZb9AePHS5C_GlkS8rPg.png" alt=" " />
+<img src="https://miro.medium.com/max/2202/1*qPMZb9AePHS5C_GlkS8rPg.png" alt=" " width="100%" />
 
 First! Please visit official document here: https://flutter.dev/docs/development/add-to-app 
 
@@ -18,7 +18,8 @@ Flutter module will receive two numbers from Android/iOS module. It will then gi
 ### Part 3. Pass Data between Flutter to Android/iOS app
 
 # Part 1. Add Flutter in existing android app
-**Create an Android Studio Project AFE-Android**
+
+### Create an Android Studio Project AFE-Android
 
 <img src="https://miro.medium.com/max/1798/1*Co5MGm3fOmgqRtwTEZccjQ.png" alt=" " width="80%"/>
 
@@ -78,8 +79,182 @@ class InputNumbersActivity : AppCompatActivity() {
 Once we integrate Flutter Module, we will use **sendDataToFlutterModule** method to open flutter module and pass the data to it. 
 As of now, we are done with **AFE-Android** part.
 
-**Create a Flutter Module module_flutter**
+### Create a Flutter Module module_flutter 
 
-Android Studio -> File -> New -> New Flutter Project -> Flutter Module. Click Next.
+Android Studio -> File -> New -> New Flutter Project -> Flutter Module. Click **Next**.
 
-<img src="https://miro.medium.com/max/1796/1*gvDQn5LECt4ktcWjcalGFw.png" alt=" "  width="50%"/>
+<img src="https://miro.medium.com/max/1796/1*gvDQn5LECt4ktcWjcalGFw.png" alt="Create a Flutter Module"  width="80%"/>
+
+Configure Flutter Module. Enter Project Name as **module_flutter**. 
+Provide Flutter SDK Path and Project location. Click **Next**.
+Set the package name. Click **Finish**.
+
+Made changes in ***main.dart*** to show two numbers received from Android/iOS module and an option to Send results back. This is how **module_flutter** module looks like:
+
+<img src="https://miro.medium.com/max/690/1*zd_qs0jrq0eVnmGUz-B8Hw.png" alt="Create a Flutter Module" height="600px"/><img src="https://miro.medium.com/max/716/1*I_2cQOqCt4BOrO17xcQp2A.png" alt="Create a Flutter Module" height="600px"/>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'AFE Flutter',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(title: 'AFE Flutter Module'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String dropdownValue = 'Add';
+  int result = 0;
+
+  _addNumbers(int n1, int n2) {
+    return n1 + n2;
+  }
+
+  _multiplyNumbers(int n1, int n2) {
+    return n1 * n2;
+  }
+
+  _setResults(int n1, int n2) {
+    setState(() {
+      if (dropdownValue == 'Add') {
+        result = _addNumbers(n1, n2);
+      } else {
+        result = _multiplyNumbers(n1, n2);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text('First Number: ',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
+                        Text('10',
+                            style: TextStyle(color: Colors.blue, fontSize: 16)),
+                      ])),
+              Container(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text('Second Number: ',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
+                        Text('20',
+                            style: TextStyle(color: Colors.blue, fontSize: 16)),
+                      ])),
+              Container(
+                  margin: EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      DropdownButton<String>(
+                        value: dropdownValue,
+                        style: TextStyle(color: Colors.blue, fontSize: 16),
+                        items: <String>['Add', 'Multiply']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            dropdownValue = newValue;
+                          });
+                        },
+                      )
+                    ],
+                  )),
+              RaisedButton(
+                onPressed: () {
+                  _setResults(10, 20);
+                  _sendResultsToAndroidiOS();
+                },
+                textColor: Colors.white,
+                padding: const EdgeInsets.all(0.0),
+                child: Container(
+                    decoration: BoxDecoration(color: Colors.blue),
+                    padding: const EdgeInsets.all(10.0),
+                    child: const Text('Send Results to Android/iOS module',
+                        style: TextStyle(fontSize: 16))),
+              ),
+              Container(
+                  margin: EdgeInsets.all(10),
+                  child: Text(
+                    'Result: $result',
+                    style: TextStyle(color: Colors.blue, fontSize: 16),
+                  ))
+            ],
+          ),
+        ));
+  }
+
+  void _sendResultsToAndroidiOS() {
+    //TODO send results to Android/iOS module
+  }
+}
+```
+
+### Integrating module_flutter in AFE-Android
+
+To import **module_flutter** module, right click on Project Name -> New -> Module. 
+Scroll to the bottom and select **“Import Flutter Module”**. Click **Next**.
+
+<img src="https://miro.medium.com/max/1798/1*XOBI59Vg_4eLZ3IBakH41w.png" alt="Import_flutter_module"  width="80%"/>
+
+On the next screen, give **module_flutter** module’s path and Click **Finish**. After finishing this, you will find below changes in gradle files.
+
+**settings.gradle** will have a path to AFE_Flutter directory.
+
+```
+include ':app'
+setBinding(new Binding([gradle: this]))
+evaluate(new File(
+  settingsDir.parentFile,
+  'module_flutter/.android/include_flutter.groovy'
+))
+```
+
+app’s **build.gradle** has a dependency added for flutter module.
+
+``` 
+implementation project(':flutter')
+```
+
+And this is how project pane looks like
+
+<img src="https://i.imgur.com/8JA1gxv.png" alt="AFE-Android project pane after importing module_flutter"  width="50%"/>
