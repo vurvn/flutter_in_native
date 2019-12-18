@@ -400,10 +400,10 @@ private fun sendDataToFlutterModule(first: Int, second: Int) {
 ```
 **We have successfully added module_flutter to the Android app.**
 
-# Part 2: Add Flutter to an existing iOS app
+# Part 2. Add Flutter to an existing iOS app
 coming soon
 
-# Part 3: Pass Data between Flutter to Android/iOS app
+# Part 3. Pass Data between Flutter to Android/iOS app
 Flutter allows you to call platform-specific APIs whether available in Java or Kotlin code on Android, or in Objective-C or Swift code on iOS.
 
 In Flutter documents, Flutter part is the client app and native part i.e. Android/iOS part is the host app. Flutter’s platform-specific API relies on a flexible message passing style. Client app (Flutter part of the app)sends the message to the host over the platform channel. The host app (Android/iOS part of the app) listens on the platform channel and receives the message.
