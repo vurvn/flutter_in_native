@@ -1,5 +1,5 @@
 # flutter_in_native
-simple flutter in native android & iOS app
+simple tutorial import flutter to native android & iOS app.
 
 <img src="https://miro.medium.com/max/2202/1*qPMZb9AePHS5C_GlkS8rPg.png" alt=" " width="100%" />
 
@@ -585,3 +585,9 @@ You can find the full source code on this Github Repositories.**
 
 ## Passing data between AFE_iOS and AFE_Flutter
 coming soon
+
+
+## This article based on
+[Add Flutter to existing Android/iOS app | Written by Nirav Tukadiya](https://medium.com/flutter-community/add-flutter-to-existing-android-ios-app-ae8c4fb1582e)
+
+[Tutorial import Flutter module to Android](https://juejin.im/post/5d47d8dc6fb9a06b0517d3d5)
