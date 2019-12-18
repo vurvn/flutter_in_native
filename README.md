@@ -238,7 +238,7 @@ Scroll to the bottom and select **“Import Flutter Module”**. Click **Next**.
 
 On the next screen, give **module_flutter** module’s path and Click **Finish**. After finishing this, you will find below changes in gradle files.
 
-**settings.gradle** will have a path to AFE_Flutter directory.
+**settings.gradle** will have a path to **module_flutter** directory.
 
 ```
 include ':app'
@@ -412,7 +412,7 @@ Messages are passed between the client (UI) and host (platform) using platform c
 
 <img src="https://miro.medium.com/max/580/1*IyZxSjFOQNVju3WUu758Bg.png" alt="Import_flutter_module"  width="100%"/>
 
-**Setting up AFE_Flutter to receive data from AFE_Android and AFE_iOS**
+**Setting up module_flutter to receive data from AFE_Android and AFE_iOS**
 
 To pass the data between the client and the host app, we must create a platform channel on which we will send/receive data.
 
@@ -436,7 +436,7 @@ _MyHomePageState() {
 }
 ```
 
-Now AFE_Flutter is listening to the channel ‘net.ngocdung.afe/data’. Any message sent to this channel will be received in **_receiveFromNative** method.
+Now **module_flutter** is listening to the channel ‘net.ngocdung.afe/data’. Any message sent to this channel will be received in **_receiveFromNative** method.
 
 ## Setting up AFE-Android to send and receive data from module_flutter
 
@@ -583,7 +583,7 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
 **We are done!! AFE-Android should show the result of the operation being performed on input numbers.
 You can find the full source code on this Github Repositories.**
 
-## Passing data between AFE_iOS and AFE_Flutter
+## Passing data between AFE_iOS and module_flutter
 coming soon
 
 
