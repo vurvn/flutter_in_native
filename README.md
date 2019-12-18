@@ -330,7 +330,152 @@ implementation 'androidx.legacy:legacy-support-v13:1.0.0'
 implementation 'androidx.annotation:annotation:1.1.0'
 ```
 
+Also, To Add Flutter module to existing Android project, Java 8 compatibility is required. Please add below lines under the android section of app’s **build.gradle** file
 
+```dart
+compileOptions {
+    sourceCompatibility 1.8
+    targetCompatibility 1.8
+}
+```
 
+## Now, we can just write a code to open flutter module in our AFE-Android app. 
+You can either create a View or a Fragment and add it to your layout.
+
+```kotlin
+//Import as a view
+val flutterView = Flutter.createView(
+    this@FlutterViewActivity,
+    lifecycle, null
+)
+
+addContentView(
+    flutterView,
+    FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+)//Import as a fragmentval tx = supportFragmentManager.beginTransaction()
+tx.replace(R.id.someContainer, Flutter.createFragment(null))
+tx.commit()
+```
+First, we will create an activity (FlutterViewActivity)and open it from InputNumbersActivity. FlutterViewActivity will render the flutter view.
+
+```kotlin
+package net.ngocdung.afe_android
+
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
+import io.flutter.facade.Flutter
+
+class FlutterViewActivity : AppCompatActivity() {
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, FlutterViewActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val flutterView = Flutter.createView(
+            this@FlutterViewActivity,
+            lifecycle, null
+        )
+
+        addContentView(
+            flutterView,
+            FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        )
+    }
+}
+```
+From InputNumbersActivity, edit function **sendDataToFlutterModule**
+
+```kotlin
+private fun sendDataToFlutterModule(first: Int, second: Int) {
+    FlutterViewActivity.startActivity(this)
+}
+```
+**We have successfully added module_flutter to the Android app.**
+
+# Part 2: Add Flutter to an existing iOS app
+coming soon
+
+# Part 3: Pass Data between Flutter to Android/iOS app
+Flutter allows you to call platform-specific APIs whether available in Java or Kotlin code on Android, or in Objective-C or Swift code on iOS.
+
+In Flutter documents, Flutter part is the client app and native part i.e. Android/iOS part is the host app. Flutter’s platform-specific API relies on a flexible message passing style. Client app (Flutter part of the app)sends the message to the host over the platform channel. The host app (Android/iOS part of the app) listens on the platform channel and receives the message.
+
+Messages are passed between the client (UI) and host (platform) using platform channels as illustrated in this diagram:
+
+<img src="https://miro.medium.com/max/580/1*IyZxSjFOQNVju3WUu758Bg.png" alt="Import_flutter_module"  width="100%"/>
+
+**Setting up AFE_Flutter to receive data from AFE_Android and AFE_iOS**
+
+To pass the data between the client and the host app, we must create a platform channel on which we will send/receive data.
+
+In module_flutter Module create a channel with the name **‘net.ngocdung.afe/data’**
+
+```dart
+class _MyHomePageState extends State<MyHomePage> {
+.....
+  static const platform = const MethodChannel(‘net.ngocdung.afe/data’);
+......
+}
+```
+
+Create a method **_receiveFromNative** to handle data received from the host. We will process the data and show it in the UI later on.
+
+Initialize the platform in the **_MyHomePageState** constructor and set the **_receiveFromNative** method as Method Call Handler.
+
+```dart
+_MyHomePageState() {
+  platform.setMethodCallHandler(_receiveFromHost);
+}
+```
+
+Now AFE_Flutter is listening to the channel ‘net.ngocdung.afe/data’. Any message sent to this channel will be received in **_receiveFromNative** method.
+
+## Setting up AFE-Android to send and receive data from module_flutter
+
+Since we rendered Flutter View inside **FlutterViewActivity**, We will set it up to send and receive data from **module_flutter**.
+
+To Send entered numbers to **module_flutter**, add below code after **addContentView** method in **FlutterViewActivity.kt**
+
+```kotlin
+val first = intent?.extras?.getInt("first")
+val second = intent?.extras?.getInt("second")
+
+val json = JSONObject()
+json.put("first", first)
+json.put("second", second)
+
+Handler().postDelayed({
+    MethodChannel(flutterView, CHANNEL).invokeMethod("formNativeToFlutter", json.toString())
+}, 500)
+```
+
+We are getting first and second numbers from previous activity in extras and creating the JSON object to send to **module_flutter**. **MethodChannel** is being used for that. **"formNativeToFlutter"** is the method name we are invoking and another is arguments in which JSON string is being passed.
+
+```
+Note: I have added the delay of 500ms because it takes a little time to render FluterView and initialize the channel. I am using emulator, you may not face this issue in the real device. Alternatively, from module_flutter you can notify host app to send data to module_flutter.
+```
+
+Now, to receive data from **module_flutter**, we need to set up **MethodCallHandler** as we did in **module_flutter**.
+
+```dart
+MethodChannel(flutterView, CHANNEL).setMethodCallHandler { call, result ->
+    // manage method calls here
+    if (call.method == "fromFlutterToNative") {
+        val resultStr = call.arguments.toString()
+        //TODO parse result string and send results back to previous activity
+    } else {
+        result.notImplemented()
+    }
+}
+```
+Here, **fromFlutterToNative** method name is being used to receive data from **module_flutter**.
 
 
