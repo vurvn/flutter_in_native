@@ -476,6 +476,112 @@ MethodChannel(flutterView, CHANNEL).setMethodCallHandler { call, result ->
     }
 }
 ```
-Here, **fromFlutterToNative** method name is being used to receive data from **module_flutter**.
+Here, **"fromFlutterToNative"** method name is being used to receive data from **module_flutter**.
 
+## Passing data between AFE-Android and module_flutter
 
+Receiving the data in **module_flutter** and showing it in UI.
+
+```dart
+Future<void> _receiveFromNative(MethodCall call) async {
+  int f = 0;
+  int s = 0;
+
+  try {
+    print(call.method);
+
+    if (call.method == "formNativeToFlutter") {
+      final String data = call.arguments;
+      print(call.arguments);
+      final jData = jsonDecode(data);
+
+      f = jData['first'];
+      s = jData['second'];
+    }
+  } on PlatformException catch (e) {
+    //platform may not able to send proper data.
+  }
+
+  setState(() {
+    _first = f;
+    _second = s;
+  });
+}
+```
+
+Also, remove hardcoded numbers in **module_flutter** and set ***_first*** and ***_second*** as a text in both the text view.
+
+Performing selected operation and sending results back to the host app.
+
+```dart
+void _sendResultsToAndroidiOS() {
+  if (dropdownValue == 'Add') {
+    _result = _addNumbers(_first, _second);
+  } else {
+    _result = _multiplyNumbers(_first, _second);
+  }
+
+  Map<String, dynamic> resultMap = Map();
+  resultMap['operation'] = dropdownValue;
+  resultMap['result'] = _result;
+
+  setState(() {
+    resultStr = resultMap.toString();
+  });
+
+  platform.invokeMethod("fromFlutterToNative", resultMap));
+}
+```
+
+Now, we need to process the data received from the client app in **FlutterViewActivity** and send it back to **InputNumbersActivity** to show it in the UI.
+
+```dart
+MethodChannel(flutterView, CHANNEL).setMethodCallHandler { call, result ->
+    // manage method calls here
+    if (call.method == "fromFlutterToNative") {
+        val resultStr = call.arguments.toString()
+        val resultJson = JSONObject(resultStr)
+        val res = resultJson.getInt("result")
+        val operation = resultJson.getString("operation")
+
+        val intent = Intent()
+        intent.putExtra("result", res)
+        intent.putExtra("operation", operation)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+    } else {
+        result.notImplemented()
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
+}
+```
+
+and in **InputNumbersActivity.kt’s onActivityResult** method,
+
+```dart
+override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+
+    if (requestCode == 100) {
+        if (resultCode == Activity.RESULT_OK) {
+            val result = data?.extras?.getInt("result")
+            val operation = data?.extras?.getString("operation")
+
+            tvResult.text = "${when (operation) {
+                "Add" -> "Addition"
+                "Multiply" -> "Multiplication"
+                else -> "NA"
+            }} of the entered numbers is $result"
+        } else {
+            tvResult.text = "Could not perform the operation"
+        }
+    }
+}
+```
+
+**We are done!! AFE-Android should show the result of the operation being performed on input numbers.
+You can find the full source code on this Github Repositories.**
+
+## Passing data between AFE_iOS and AFE_Flutter
+coming soon
