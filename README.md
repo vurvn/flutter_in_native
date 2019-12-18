@@ -258,3 +258,79 @@ implementation project(':flutter')
 And this is how project pane looks like
 
 <img src="https://i.imgur.com/8JA1gxv.png" alt="AFE-Android project pane after importing module_flutter"  width="50%"/>
+
+
+# If you select **use androidx. artifacts**, you will meet issues after compile build the project like this.
+
+<img src="https://i.imgur.com/mI04Epm.png" alt="Import_flutter_module"  width="80%"/>
+
+## change import packages and dependencies
+> android/Flutter/src/main/java/io/flutter/facade/Flutter.java
+```dart
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
+import android.support.annotation.NonNull;
+//change to
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.annotation.NonNull;
+```
+> android/Flutter/src/main/java/io/flutter/facade/FlutterFragment.java
+
+```dart
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+//change to
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+```
+
+<img src="https://i.imgur.com/lQYyZBD.png" alt="Import_flutter_module"  width="80%"/>
+
+> android/app/build.gradle
+
+<img src="https://i.imgur.com/atc7z56.png" alt="Import_flutter_module"  width="80%"/>
+
+```dart
+testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//change to
+testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+```
+
+```dart
+implementation 'com.android.support:appcompat-v7:27.1.1'
+implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+implementation 'com.android.support:design:27.1.1'
+androidTestImplementation 'com.android.support.test:runner:1.0.2'
+androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+//change to
+implementation 'androidx.appcompat:appcompat:1.1.0'
+implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+androidTestImplementation 'androidx.test:runner:1.2.0'
+androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+```
+
+> android/flutter/build.gradle
+
+<img src="https://i.imgur.com/WVUndY6.png" alt="Import_flutter_module"  width="80%"/>
+
+```dart
+testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//change to
+testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+```
+
+```dart
+implementation 'com.android.support:support-v13:27.1.1'
+implementation 'com.android.support:support-annotations:27.1.1
+//change to
+implementation 'androidx.legacy:legacy-support-v13:1.0.0'
+implementation 'androidx.annotation:annotation:1.1.0'
+```
+
+
+
+
+
