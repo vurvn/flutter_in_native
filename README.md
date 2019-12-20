@@ -401,7 +401,44 @@ private fun sendDataToFlutterModule(first: Int, second: Int) {
 **We have successfully added module_flutter to the Android app.**
 
 # Part 2. Add Flutter to an existing iOS app
-coming soon
+**Create an XCode project AFEiOS**
+
+
+<img src="https://i.imgur.com/wrdTHU6.png" alt="Import_flutter_module"  width="100%"/>
+
+
+After creating the project, I made changes in UI and added validation for input fields. This is how the iOS app looks like
+
+<img src="https://miro.medium.com/max/1376/1*f7e6EjbVgbqZ3qCiJDn3tQ.png" alt="Import_flutter_module"  width="50%"/>
+
+
+We will use the same **sendDataToFlutterModule** method to pass data to the flutter module.
+
+**Integrating module_flutter in AFE_iOS**
+Integrating the Flutter framework requires the use of the CocoaPods dependency manager. This is because the Flutter framework needs to be available also to any Flutter plugins that you might include in **module_flutter**.
+
+If your app already uses CocoaPods then add below lines to Podfile.
+
+```Podfile
+flutter_application_path = '/Users/vupham/FlutterProjects/flutter_in_native/module_flutter/'
+
+eval(File.read(File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')), binding)
+```
+
+```
+Note:
+If your app doesn't use CocoaPods, follow below steps: 
+- Open Termnial -> ```sudo gem install cocoapods``` -> This installs CocoaPods as a piece of software on your machine.
+- Go to the root of your project directory and execute ```pod init``` -> This will add a base Podfile to your project.
+```
+Now, close the pod file and Xcode and run pod install inside your project directory. Once done, reopen the project from .xcworkspace file.
+
+```
+Note: 
+Make sure you don’t open .xcodeproject file otherwise you will get compilation errors regarding Flutter Framework not found.
+```
+
+
 
 # Part 3. Pass Data between Flutter to Android/iOS app
 Flutter allows you to call platform-specific APIs whether available in Java or Kotlin code on Android, or in Objective-C or Swift code on iOS.
